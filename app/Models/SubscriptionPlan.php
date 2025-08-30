@@ -15,6 +15,8 @@ class SubscriptionPlan extends Model
         'slug',
         'description',
         'price',
+        'billing_period',
+        'trial_days',
         'features',
         'max_users',
         'max_patients',
@@ -26,6 +28,9 @@ class SubscriptionPlan extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'trial_days' => 'integer',
+        'max_users' => 'integer',
+        'max_patients' => 'integer',
         'features' => 'array',
         'has_inventory' => 'boolean',
         'has_reports' => 'boolean',
@@ -36,6 +41,13 @@ class SubscriptionPlan extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function activeSubscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class)
+            ->whereIn('status', ['active', 'trial'])
+            ->where('ends_at', '>', now());
     }
 
     public function scopeActive($query)

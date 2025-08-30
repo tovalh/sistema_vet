@@ -14,6 +14,7 @@ class Tenant extends Model
     protected $fillable = [
         'name',
         'slug',
+        'subdomain',
         'email',
         'phone',
         'address',
@@ -21,11 +22,19 @@ class Tenant extends Model
         'settings',
         'status',
         'trial_ends_at',
+        'suspended_at',
+        'suspension_reason',
+        'public_booking_enabled',
+        'primary_color',
+        'booking_settings',
     ];
 
     protected $casts = [
         'settings' => 'array',
+        'booking_settings' => 'array',
         'trial_ends_at' => 'datetime',
+        'suspended_at' => 'datetime',
+        'public_booking_enabled' => 'boolean',
     ];
 
     public function users(): HasMany
@@ -51,7 +60,7 @@ class Tenant extends Model
     public function activeSubscription(): HasOne
     {
         return $this->hasOne(Subscription::class)
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'trial'])
             ->where('ends_at', '>', now())
             ->latest();
     }

@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2); // Precio mensual
+            $table->string('billing_period')->default('monthly'); // monthly, yearly
+            $table->integer('trial_days')->default(14); // Días de prueba gratuita
             $table->json('features'); // Lista de características incluidas
             $table->integer('max_users')->default(1); // Límite de usuarios
             $table->integer('max_patients')->nullable(); // Límite de pacientes (null = ilimitado)

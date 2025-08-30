@@ -39,6 +39,11 @@ export interface SharedData {
     auth: Auth;
     currentBranch?: Branch;
     availableBranches?: Branch[];
+    impersonating?: {
+        is_impersonating: boolean;
+        admin_id?: number;
+        start_time?: string;
+    };
     sidebarOpen: boolean;
     [key: string]: unknown;
 }

@@ -25,8 +25,8 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
             
-            {/* Branch Selector in Header */}
-            {currentBranch && availableBranches && availableBranches.length > 0 && (
+            {/* Branch Selector in Header - Siempre visible */}
+            {currentBranch && availableBranches && (
                 <div className="ml-auto flex items-center gap-2">
                     <span className="text-xs font-medium text-gray-600">🏥 Sucursal:</span>
                     <Select 
@@ -37,18 +37,24 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            {availableBranches.map((branch) => (
-                                <SelectItem key={branch.id} value={branch.id.toString()}>
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-medium">{branch.name}</span>
-                                        {branch.is_main && (
-                                            <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                                                Principal
-                                            </span>
-                                        )}
-                                    </div>
+                            {availableBranches.length > 0 ? (
+                                availableBranches.map((branch) => (
+                                    <SelectItem key={branch.id} value={branch.id.toString()}>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">{branch.name}</span>
+                                            {branch.is_main && (
+                                                <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                                                    Principal
+                                                </span>
+                                            )}
+                                        </div>
+                                    </SelectItem>
+                                ))
+                            ) : (
+                                <SelectItem value="no-branches" disabled>
+                                    No hay sucursales disponibles
                                 </SelectItem>
-                            ))}
+                            )}
                         </SelectContent>
                     </Select>
                 </div>

@@ -19,30 +19,38 @@ class BranchMiddleware
         if (auth()->check() && !auth()->user()->isSuperAdmin() && session('tenant_id')) {
             $user = auth()->user();
             
-            // Si el usuario no tiene sucursal asignada, asignar la principal
-            if (!$user->branch_id) {
-                $mainBranch = Branch::where('tenant_id', $user->tenant_id)
-                    ->where('is_main', true)
-                    ->first();
+            // Obtener las sucursales accesibles para este usuario
+            $accessibleBranches = $user->getAccessibleBranches();
+            
+            // Si el usuario no tiene sucursal actual asignada o no tiene acceso a ella
+            $currentBranchId = $user->branch_id;
+            if (!$currentBranchId || !$user->hasAccessToBranch($currentBranchId)) {
+                // Asignar la primera sucursal accesible (preferir la principal)
+                $newBranch = $accessibleBranches->where('is_main', true)->first() 
+                    ?: $accessibleBranches->first();
                     
-                if ($mainBranch) {
-                    $user->update(['branch_id' => $mainBranch->id]);
+                if ($newBranch) {
+                    $user->update(['branch_id' => $newBranch->id]);
+                    $currentBranchId = $newBranch->id;
                 }
             }
             
             // Establecer branch_id en sesión
-            if ($user->branch_id) {
-                session(['branch_id' => $user->branch_id]);
+            if ($currentBranchId) {
+                session(['branch_id' => $currentBranchId]);
                 
                 // Obtener información de la sucursal actual
-                $currentBranch = Branch::find($user->branch_id);
+                $currentBranch = Branch::find($currentBranchId);
                 view()->share('currentBranch', $currentBranch);
                 
-                // Obtener todas las sucursales del tenant para el selector
-                $availableBranches = Branch::where('tenant_id', $user->tenant_id)
-                    ->where('is_active', true)
-                    ->get();
+                // Compartir sucursales disponibles para el selector (solo las accesibles)
+                $availableBranches = $accessibleBranches->where('is_active', true);
                 view()->share('availableBranches', $availableBranches);
+            } else {
+                // Usuario sin acceso a ninguna sucursal
+                if (!$user->isOwner()) {
+                    abort(403, 'No tienes acceso a ninguna sucursal. Contacta al administrador.');
+                }
             }
         }
         

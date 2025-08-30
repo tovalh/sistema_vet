@@ -1,7 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import AppLayout from '@/layouts/app-layout'
 import { dashboard } from '@/routes'
 import { type BreadcrumbItem, type SharedData } from '@/types'
@@ -84,17 +83,6 @@ export default function Dashboard({
   upcomingAppointments, 
   recentPatients 
 }: Props) {
-  const { props } = usePage<SharedData>();
-
-  const handleBranchChange = (branchId: string) => {
-    router.post('/branch/switch', { branch_id: parseInt(branchId) }, {
-      preserveState: true,
-      preserveScroll: true,
-      onSuccess: () => {
-        window.location.reload()
-      }
-    })
-  }
   const formatTime = (datetime: string) => {
     return new Date(datetime).toLocaleTimeString('es', { 
       hour: '2-digit', 
@@ -131,54 +119,8 @@ export default function Dashboard({
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
             <p className="text-gray-600">Resumen de actividad de tu clínica veterinaria</p>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-700">🏥 Sucursal:</span>
-            <Select 
-              value={props.currentBranch?.id?.toString() || ''} 
-              onValueChange={handleBranchChange}
-            >
-              <SelectTrigger className="w-64">
-                <SelectValue placeholder="Selecciona una sucursal" />
-              </SelectTrigger>
-              <SelectContent>
-                {props.availableBranches?.map((branch) => (
-                  <SelectItem key={branch.id} value={branch.id.toString()}>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{branch.name}</span>
-                      {branch.is_main && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-                          Principal
-                        </span>
-                      )}
-                    </div>
-                  </SelectItem>
-                )) || []}
-              </SelectContent>
-            </Select>
-          </div>
         </div>
             
-        {/* DEBUG: Show branch data directly on page */}
-        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h3 className="font-medium text-yellow-800">🔍 Debug - Datos de Sucursales:</h3>
-          <div className="mt-2 space-y-1 text-sm">
-            <div>
-              <strong>Sucursal Actual:</strong> {JSON.stringify(props.currentBranch || 'No data')}
-            </div>
-            <div>
-              <strong>Sucursales Disponibles:</strong> {JSON.stringify(props.availableBranches || 'No data')}
-            </div>
-            <div>
-              <strong>Usuario:</strong> {props.auth?.user?.name || 'No user'} ({props.auth?.user?.email || 'No email'})
-            </div>
-            <div>
-              <strong>Tenant ID:</strong> {props.auth?.user?.tenant_id || 'No tenant'}
-            </div>
-            <div>
-              <strong>Branch ID:</strong> {props.auth?.user?.branch_id || 'No branch'}
-            </div>
-          </div>
-        </div>
 
         {/* Action Buttons */}
         <div className="flex gap-2">

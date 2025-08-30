@@ -7,10 +7,11 @@ use App\Traits\BelongsToBranch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Appointment extends Model
 {
-    use HasFactory, BelongsToTenant, BelongsToBranch;
+    use HasFactory, BelongsToTenant, BelongsToBranch, SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
@@ -24,6 +25,7 @@ class Appointment extends Model
         'reason',
         'notes',
         'price',
+        'is_public_booking',
     ];
 
     protected $casts = [

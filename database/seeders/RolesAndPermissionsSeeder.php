@@ -64,18 +64,18 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // Crear roles y asignar permisos
         
         // Super Administrador (Global)
-        $superAdmin = Role::create(['name' => 'super-admin']);
-        $superAdmin->givePermissionTo(Permission::all());
+        $superAdmin = Role::firstOrCreate(['name' => 'super-admin']);
+        $superAdmin->syncPermissions(Permission::all());
         
         // Administrador de Clínica (Owner)
-        $clinicOwner = Role::create(['name' => 'clinic-owner']);
-        $clinicOwner->givePermissionTo([
+        $clinicOwner = Role::firstOrCreate(['name' => 'clinic-owner']);
+        $clinicOwner->syncPermissions([
             'users.view', 'users.create', 'users.edit', 'users.delete',
             'patients.view', 'patients.create', 'patients.edit', 'patients.delete',
             'appointments.view', 'appointments.create', 'appointments.edit', 'appointments.delete',
@@ -87,8 +87,8 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
         
         // Doctor/Veterinario
-        $doctor = Role::create(['name' => 'doctor']);
-        $doctor->givePermissionTo([
+        $doctor = Role::firstOrCreate(['name' => 'doctor']);
+        $doctor->syncPermissions([
             'patients.view', 'patients.create', 'patients.edit',
             'appointments.view', 'appointments.edit',
             'medical-records.view', 'medical-records.create', 'medical-records.edit', 'medical-records.delete',
@@ -97,8 +97,8 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
         
         // Secretaria/Recepcionista
-        $secretary = Role::create(['name' => 'secretary']);
-        $secretary->givePermissionTo([
+        $secretary = Role::firstOrCreate(['name' => 'secretary']);
+        $secretary->syncPermissions([
             'patients.view', 'patients.create', 'patients.edit',
             'appointments.view', 'appointments.create', 'appointments.edit', 'appointments.delete',
             'billing.view', 'billing.create', 'billing.edit',

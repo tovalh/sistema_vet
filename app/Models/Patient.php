@@ -6,15 +6,18 @@ use App\Traits\BelongsToTenant;
 use App\Traits\BelongsToBranch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Patient extends Model
 {
-    use HasFactory, BelongsToTenant, BelongsToBranch;
+    use HasFactory, BelongsToTenant, BelongsToBranch, SoftDeletes;
 
     protected $fillable = [
         'tenant_id',
         'branch_id',
+        'tutor_id',
         'name',
         'species',
         'breed',
@@ -23,10 +26,6 @@ class Patient extends Model
         'weight',
         'color',
         'microchip',
-        'owner_name',
-        'owner_phone',
-        'owner_email',
-        'owner_address',
         'medical_notes',
         'is_active',
     ];
@@ -36,6 +35,12 @@ class Patient extends Model
         'weight' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    // Un paciente pertenece a un tutor (cliente)
+    public function tutor(): BelongsTo
+    {
+        return $this->belongsTo(Tutor::class);
+    }
 
     public function appointments(): HasMany
     {

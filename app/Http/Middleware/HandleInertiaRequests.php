@@ -38,19 +38,8 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        // Debug: Log what we're sharing
         $currentBranch = $this->getCurrentBranch($request);
         $availableBranches = $this->getAvailableBranches($request);
-        
-        \Log::info('HandleInertiaRequests::share() debug', [
-            'user_id' => $request->user()?->id,
-            'user_email' => $request->user()?->email,
-            'user_tenant_id' => $request->user()?->tenant_id,
-            'user_branch_id' => $request->user()?->branch_id,
-            'currentBranch' => $currentBranch ? $currentBranch->toArray() : null,
-            'availableBranches_count' => $availableBranches ? count($availableBranches) : 0,
-            'availableBranches' => $availableBranches ? $availableBranches->toArray() : [],
-        ]);
 
         return [
             ...parent::share($request),
@@ -61,6 +50,11 @@ class HandleInertiaRequests extends Middleware
             ],
             'currentBranch' => $currentBranch,
             'availableBranches' => $availableBranches,
+            'impersonating' => [
+                'is_impersonating' => session()->has('impersonating_admin_id'),
+                'admin_id' => session('impersonating_admin_id'),
+                'start_time' => session('impersonating_start'),
+            ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

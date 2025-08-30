@@ -1,6 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Head } from '@inertiajs/react'
+import { Button } from '@/components/ui/button'
+import AdminLayout from '@/layouts/admin-layout'
+import { type BreadcrumbItem } from '@/types'
+import { Head, Link } from '@inertiajs/react'
 import { 
   Building2, 
   Users, 
@@ -55,6 +58,13 @@ interface Props {
   plans: Plan[]
 }
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Admin Dashboard',
+        href: '/admin',
+    },
+];
+
 export default function AdminDashboard({ stats, tenants, plans }: Props) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -66,13 +76,23 @@ export default function AdminDashboard({ stats, tenants, plans }: Props) {
   }
 
   return (
-    <>
+    <AdminLayout breadcrumbs={breadcrumbs}>
       <Head title="Panel de Administración - Sistema Veterinario" />
       
       <div className="p-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Panel de Super Administración</h1>
-          <p className="text-gray-600">Vista global del sistema multi-tenancy</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Panel de Super Administración</h1>
+            <p className="text-gray-600">Vista global del sistema multi-tenancy</p>
+          </div>
+          <div className="flex gap-2">
+            <Button asChild>
+              <Link href="/admin/clinics">Gestionar Clínicas</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/admin/users">Gestionar Usuarios</Link>
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -227,6 +247,6 @@ export default function AdminDashboard({ stats, tenants, plans }: Props) {
           </div>
         </div>
       </div>
-    </>
+    </AdminLayout>
   )
 }

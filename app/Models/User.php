@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -67,6 +69,29 @@ class User extends Authenticatable
         return $this->belongsTo(Branch::class);
     }
 
+    public function branches(): BelongsToMany
+    {
+        return $this->belongsToMany(Branch::class, 'user_branches');
+    }
+
+    public function hasAccessToBranch(int $branchId): bool
+    {
+        if ($this->isOwner()) {
+            return $this->tenant->branches()->where('id', $branchId)->exists();
+        }
+        
+        return $this->branches()->where('branch_id', $branchId)->exists();
+    }
+
+    public function getAccessibleBranches()
+    {
+        if ($this->isOwner()) {
+            return $this->tenant->branches()->active()->get();
+        }
+        
+        return $this->branches()->active()->get();
+    }
+
     public function isSuperAdmin(): bool
     {
         return $this->is_super_admin;
@@ -90,5 +115,20 @@ class User extends Authenticatable
     public function isSecretary(): bool
     {
         return $this->hasRole('secretary');
+    }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class, 'doctor_id');
+    }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class, 'doctor_id');
+    }
+
+    public function blockedTimes(): HasMany
+    {
+        return $this->hasMany(BlockedTime::class, 'doctor_id');
     }
 }

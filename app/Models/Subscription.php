@@ -43,7 +43,7 @@ class Subscription extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('status', 'active')
+        return $query->whereIn('status', ['active', 'trial'])
                     ->where('ends_at', '>', now());
     }
 
@@ -54,7 +54,7 @@ class Subscription extends Model
 
     public function isActive(): bool
     {
-        return $this->status === 'active' && $this->ends_at->isFuture();
+        return in_array($this->status, ['active', 'trial']) && $this->ends_at->isFuture();
     }
 
     public function isExpired(): bool
